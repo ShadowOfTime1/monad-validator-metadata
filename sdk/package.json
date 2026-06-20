@@ -1,0 +1,29 @@
+{
+  "name": "@shadowoftime/mrc13",
+  "version": "0.1.0",
+  "description": "Resolver SDK, validator-info migration, and indexer for the MRC-13 validator metadata registry on Monad.",
+  "type": "module",
+  "bin": {
+    "mrc13": "dist/cli.js"
+  },
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test src/*.test.ts",
+    "mrc13": "tsx src/cli.ts"
+  },
+  "engines": { "node": ">=18" },
+  "license": "MIT",
+  "dependencies": {
+    "viem": "^2.21.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}

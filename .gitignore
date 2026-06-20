@@ -1,0 +1,11 @@
+# Foundry
+out/
+cache/
+broadcast/
+docs/
+
+# Node / SDK
+sdk/node_modules/
+sdk/dist/
+*.log
+.DS_Store
