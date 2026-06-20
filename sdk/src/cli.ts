@@ -58,7 +58,7 @@ async function main(): Promise<void> {
     return;
   }
 
-  console.log(`mrc13 — MRC-13 validator metadata tooling
+  console.log(`mrc13: MRC-13 validator metadata tooling
 
 Commands:
   migrate --dir <validator-info/testnet> [--out calls.json]

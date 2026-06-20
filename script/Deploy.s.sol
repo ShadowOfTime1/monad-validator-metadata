@@ -5,10 +5,8 @@ import {Script, console} from "forge-std/Script.sol";
 import {ValidatorMetadataRegistry} from "../src/ValidatorMetadataRegistry.sol";
 import {IStakingPrecompile} from "../src/IStakingPrecompile.sol";
 
-/// @notice Deploys the registry pointed at the real Monad staking precompile.
-/// @dev Usage:
-///   forge script script/Deploy.s.sol --rpc-url <monad-rpc> --broadcast \
-///       --private-key <key>
+// Deploys the registry against the real staking precompile.
+// forge script script/Deploy.s.sol --rpc-url <monad-rpc> --broadcast --private-key <key>
 contract Deploy is Script {
     address constant STAKING_PRECOMPILE = 0x0000000000000000000000000000000000001000;
 

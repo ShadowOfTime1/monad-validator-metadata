@@ -4,20 +4,12 @@ import { encodeFunctionData } from "viem";
 import { registryAbi } from "./abi.registry.js";
 import { EMPTY_METADATA, type Metadata } from "./types.js";
 
-/**
- * Migration from the off-chain `validator-info` directory
- * (github.com/monad-developers/validator-info) to MRC-13 on-chain records.
- *
- * This is the bridge the MRC-13 draft does not specify but every operator needs:
- * it turns today's Discord-gated JSON directory (one `<secp>.json` per validator)
- * into ready-to-submit `setMetadata` calldata, so the existing ecosystem data
- * carries over instead of starting from an empty registry.
- *
- * Each validator submits only their OWN call (authorized by their own staking
- * key); this tool just prepares the calldata.
- */
+// Turn the existing off-chain validator-info directory
+// (github.com/monad-developers/validator-info, one <secp>.json per validator)
+// into setMetadata calldata, so existing data carries over instead of starting
+// from an empty registry. Each validator submits their own call, signed by
+// their own staking key; this just prepares the calldata.
 
-/** Shape of a validator-info entry. */
 export interface ValidatorInfoEntry {
   id: number;
   name?: string;
@@ -32,12 +24,10 @@ export interface ValidatorInfoEntry {
 export interface MigrationCall {
   validatorId: number;
   name: string;
-  /** ABI-encoded calldata for setMetadata(validatorId, metadata). */
   calldata: `0x${string}`;
   metadata: Metadata;
 }
 
-/** Map one validator-info entry to an MRC-13 metadata record. */
 export function entryToMetadata(entry: ValidatorInfoEntry): Metadata {
   const socials: Record<string, string> = {};
   if (entry.x) socials.x = entry.x;
@@ -51,7 +41,6 @@ export function entryToMetadata(entry: ValidatorInfoEntry): Metadata {
   };
 }
 
-/** Build the setMetadata calldata for a single entry. */
 export function buildCall(entry: ValidatorInfoEntry): MigrationCall {
   const metadata = entry.id !== undefined ? entryToMetadata(entry) : EMPTY_METADATA;
   const calldata = encodeFunctionData({
@@ -72,7 +61,6 @@ export function buildCall(entry: ValidatorInfoEntry): MigrationCall {
   return { validatorId: entry.id, name: metadata.name, calldata, metadata };
 }
 
-/** Read a validator-info directory (testnet/ or mainnet/) and build all calls. */
 export function buildMigration(dir: string): MigrationCall[] {
   const files = readdirSync(dir).filter((f) => f.endsWith(".json"));
   const calls: MigrationCall[] = [];
@@ -82,7 +70,7 @@ export function buildMigration(dir: string): MigrationCall[] {
       if (typeof entry.id !== "number") continue;
       calls.push(buildCall(entry));
     } catch {
-      // skip malformed files; the upstream repo's own validator runs on PRs
+      // skip malformed files; the upstream repo validates entries on PR
     }
   }
   calls.sort((a, b) => a.validatorId - b.validatorId);

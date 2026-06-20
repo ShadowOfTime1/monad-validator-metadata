@@ -1,32 +1,24 @@
 import type { Metadata } from "./types.js";
 
-/**
- * Consumer-side sanitization for untrusted on-chain metadata.
- *
- * The registry stores raw bytes and makes no display guarantees (see MRC-13
- * topic 497, "phishing-vector guidance" raised by the community). Anything an
- * arbitrary validator can write is attacker-controlled: a name with zero-width
- * characters that impersonates another validator, a `logo` pointing at a
- * `javascript:` URL, a `website` that is actually a wallet drainer. This module
- * is what a wallet/explorer/dashboard should run before rendering a record.
- *
- * It does not mutate trust — it flags risk and returns a display-safe copy.
- */
+// Metadata is attacker-controlled (anyone can write their own record), so clean
+// it before showing it: a name with zero-width chars can impersonate another
+// validator, a logo could be a javascript: URL, etc. This is what a wallet or
+// explorer should run before rendering. It flags risks and returns a safe copy;
+// it doesn't change who's trusted.
 
 const MAX = { name: 64, website: 256, description: 512, logo: 256, socials: 4096, additionalInfo: 8192 } as const;
 
-/** C0 (0x00–0x1F) and C1 (0x7F–0x9F) control characters. */
 function isControl(cp: number): boolean {
   return (cp >= 0x00 && cp <= 0x1f) || (cp >= 0x7f && cp <= 0x9f);
 }
 
-/** Zero-width and bidirectional-override characters used to spoof/hide text. */
+// Zero-width and bidi-override characters used to spoof or hide text.
 function isInvisible(cp: number): boolean {
   return (
-    (cp >= 0x200b && cp <= 0x200f) || // zero-width + LRM/RLM
-    (cp >= 0x202a && cp <= 0x202e) || // bidi embeddings/overrides
-    (cp >= 0x2060 && cp <= 0x206f) || // word joiner & invisible operators
-    cp === 0xfeff // zero-width no-break space / BOM
+    (cp >= 0x200b && cp <= 0x200f) ||
+    (cp >= 0x202a && cp <= 0x202e) ||
+    (cp >= 0x2060 && cp <= 0x206f) ||
+    cp === 0xfeff
   );
 }
 
@@ -87,7 +79,6 @@ function checkJson(s: string, field: string, warnings: string[]): void {
   }
 }
 
-/** Produce a display-safe copy of a metadata record plus any risk warnings. */
 export function sanitizeMetadata(raw: Metadata): SanitizeResult {
   const warnings: string[] = [];
   const value: Metadata = {

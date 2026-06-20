@@ -3,8 +3,8 @@ pragma solidity ^0.8.24;
 
 import {IStakingPrecompile} from "../../src/IStakingPrecompile.sol";
 
-/// @notice Test double for the staking precompile. Lets tests assign an
-///         authority address per validator id and an enumerable set.
+// Test double for the staking precompile: set an authority per validator id
+// and a validator set to enumerate.
 contract MockStakingPrecompile is IStakingPrecompile {
     mapping(uint64 => address) public auth;
     uint64[] public set;

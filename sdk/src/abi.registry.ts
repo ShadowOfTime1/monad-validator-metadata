@@ -1,4 +1,4 @@
-// Auto-generated from the compiled ValidatorMetadataRegistry artifact. Do not edit by hand.
+// ABI of ValidatorMetadataRegistry, kept in sync with the compiled contract.
 export const registryAbi = [
   {
     "type": "constructor",

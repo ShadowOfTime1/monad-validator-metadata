@@ -20,13 +20,9 @@ export interface Directory {
   validators: ResolvedValidator[];
 }
 
-/**
- * Build a resolved validator directory by reading MetadataUpdated logs.
- *
- * Output is the on-chain sibling of validator-info's consolidated JSON: a
- * directory anyone can regenerate from the chain, with no curator. Each entry
- * carries its authority address and any sanitization warnings.
- */
+// Rebuild a validator directory from MetadataUpdated logs. This is the on-chain
+// equivalent of validator-info's consolidated JSON, except anyone can regenerate
+// it from the chain with no curator.
 export async function buildDirectory(opts: IndexOptions): Promise<Directory> {
   const client = createPublicClient({ transport: http(opts.rpcUrl) as Transport });
   const latest = await client.getBlockNumber();

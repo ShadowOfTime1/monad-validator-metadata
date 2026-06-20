@@ -8,41 +8,29 @@ import {
 } from "viem";
 import { registryAbi } from "./abi.registry.js";
 import { stakingPrecompileAbi, STAKING_PRECOMPILE } from "./abi.staking.js";
-import { CANONICAL_REGISTRY } from "./chains.js";
 import { sanitizeMetadata } from "./sanitize.js";
 import { EMPTY_METADATA, type Metadata, type ResolvedValidator } from "./types.js";
 
 export interface ResolverConfig {
   rpcUrl: string;
-  /** Registry address; falls back to the canonical deployment for the chain. */
   registryAddress?: `0x${string}`;
 }
 
-/**
- * Read-side resolver for MRC-13 metadata.
- *
- * Resolution model: the registry verifies, on every write, that the writer is
- * the validator's staking authority. So a record's trust root is the *authority
- * address*, not the registry address — `resolve()` returns both, letting a
- * consumer pin trust to the authority and treat the registry address as a mere
- * lookup location (the discovery convention from MRC-13 topic 497).
- */
+// Read side of MRC-13. A record's trust root is the validator's authority
+// address (the contract verifies it on every write), not the registry address,
+// so resolve() returns both and a consumer can pin trust to the authority.
 export class MetadataResolver {
   private client: PublicClient;
   readonly registryAddress: `0x${string}`;
 
   constructor(cfg: ResolverConfig) {
     this.client = createPublicClient({ transport: http(cfg.rpcUrl) as Transport });
-    const addr = cfg.registryAddress;
-    if (!addr) {
-      throw new Error(
-        "registryAddress is required (no canonical deployment is configured yet for this chain).",
-      );
+    if (!cfg.registryAddress) {
+      throw new Error("registryAddress is required (no canonical deployment configured yet for this chain).");
     }
-    this.registryAddress = addr;
+    this.registryAddress = cfg.registryAddress;
   }
 
-  /** Raw, unsanitized metadata for a validator. */
   async getMetadata(validatorId: number | bigint): Promise<Metadata> {
     const res = (await this.client.readContract({
       address: this.registryAddress,
@@ -53,7 +41,6 @@ export class MetadataResolver {
     return res ?? EMPTY_METADATA;
   }
 
-  /** Has any record ever been written for this validator? */
   async hasMetadata(validatorId: number | bigint): Promise<boolean> {
     return (await this.client.readContract({
       address: this.registryAddress,
@@ -63,7 +50,7 @@ export class MetadataResolver {
     })) as boolean;
   }
 
-  /** The staking authority address for a validator (root of trust), or null. */
+  // getValidator is nonpayable, so call via eth_call and decode the first return.
   async authorityOf(validatorId: number | bigint): Promise<`0x${string}` | null> {
     const data = encodeFunctionData({
       abi: stakingPrecompileAbi,
@@ -85,7 +72,6 @@ export class MetadataResolver {
     }
   }
 
-  /** Full resolution: authority + sanitized metadata + warnings. */
   async resolve(validatorId: number | bigint): Promise<ResolvedValidator> {
     const [raw, has, authority] = await Promise.all([
       this.getMetadata(validatorId),
@@ -96,11 +82,9 @@ export class MetadataResolver {
     return { validatorId: Number(validatorId), authority, metadata: value, hasMetadata: has, warnings };
   }
 
-  /** Enumerate the consensus validator-id set via the staking precompile. */
   async listValidatorIds(): Promise<number[]> {
     const ids: number[] = [];
     let start = 0;
-    // Bounded loop; the precompile returns isDone.
     for (let guard = 0; guard < 10_000; guard++) {
       const data = encodeFunctionData({
         abi: stakingPrecompileAbi,
@@ -121,7 +105,6 @@ export class MetadataResolver {
     return ids;
   }
 
-  /** Resolve every validator in the consensus set that has a metadata record. */
   async resolveAll(): Promise<ResolvedValidator[]> {
     const ids = await this.listValidatorIds();
     const out: ResolvedValidator[] = [];

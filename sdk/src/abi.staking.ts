@@ -1,5 +1,4 @@
-/// Minimal staking-precompile ABI (read paths the resolver uses).
-/// Address: 0x0000000000000000000000000000000000001000
+// Staking precompile (0x...1000), only the reads the resolver needs.
 export const stakingPrecompileAbi = [
   {
     type: "function",

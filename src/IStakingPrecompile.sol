@@ -1,15 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-/// @title Minimal interface to the Monad staking precompile.
-/// @notice Address `0x0000000000000000000000000000000000001000`. Only the parts
-///         this registry needs are declared here. Full reference:
-///         https://docs.monad.xyz/developer-essentials/staking/staking-precompile
+// Just the parts of the Monad staking precompile this registry needs.
+// Precompile lives at 0x0000000000000000000000000000000000001000.
+// Full reference: https://docs.monad.xyz/developer-essentials/staking/staking-precompile
 interface IStakingPrecompile {
-    /// @notice Returns a validator's execution-layer state.
-    /// @dev The first return value, `authAddress`, is the delegator account with
-    ///      authority over the validator's stake — the identity this registry
-    ///      uses to authorize metadata writes.
+    // First return value (authAddress) is the account with authority over the
+    // validator's stake. That's the identity we check before allowing a write.
     function getValidator(uint64 validatorId)
         external
         returns (
@@ -27,7 +24,6 @@ interface IStakingPrecompile {
             bytes memory blsPubkey
         );
 
-    /// @notice Enumerate the consensus validator set, paginated by index.
     function getConsensusValidatorSet(uint32 startIndex)
         external
         returns (bool isDone, uint32 nextIndex, uint64[] memory valIds);

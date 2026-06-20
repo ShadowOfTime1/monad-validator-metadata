@@ -1,12 +1,10 @@
-/** The MRC-13 metadata record, as stored on-chain. */
+// The MRC-13 record as stored on-chain. socials/additionalInfo are JSON strings.
 export interface Metadata {
   name: string;
   website: string;
   description: string;
   logo: string;
-  /** JSON string, suggested object keyed by platform: {"x": "...", "telegram": "..."} */
   socials: string;
-  /** Open-schema JSON string for forward-compatible extensions (e.g. infrastructure). */
   additionalInfo: string;
 }
 
@@ -19,14 +17,11 @@ export const EMPTY_METADATA: Metadata = {
   additionalInfo: "",
 };
 
-/** A validator's metadata resolved from the registry, with provenance. */
 export interface ResolvedValidator {
   validatorId: number;
-  /** Staking authority address that controls this record (root of trust). */
+  // Staking authority that controls this record (the trust root).
   authority: `0x${string}` | null;
   metadata: Metadata;
-  /** True if a record has ever been written on-chain. */
   hasMetadata: boolean;
-  /** Non-fatal sanitization warnings from inspecting the record. */
   warnings: string[];
 }
