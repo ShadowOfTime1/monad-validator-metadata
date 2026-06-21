@@ -2,7 +2,7 @@
 pragma solidity ^0.8.24;
 
 // MRC-13 Validator Metadata Registry interface.
-// Spec: Monad forum topic 497 (Đorđe Mijović), draft 2026-06-15.
+// Spec: Monad forum topic 497 (Đorđe Mijović), draft 2026-06-16.
 //
 // The staking precompile only exposes consensus data (ids, authority, stake,
 // commission). This is the human-readable layer on top of it, keyed by
@@ -10,7 +10,8 @@ pragma solidity ^0.8.24;
 interface IValidatorMetadata {
     // socials and additionalInfo are JSON strings so the schema can grow without
     // a new contract. socials is an object keyed by platform ("x", "telegram").
-    // additionalInfo is free-form, e.g. {"provider","asn","region"}.
+    // additionalInfo is free-form; the thread suggests an optional
+    // "infrastructure": {"provider","asn","region"} object.
     struct Metadata {
         string name;
         string website;

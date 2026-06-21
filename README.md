@@ -3,7 +3,7 @@
 A reference implementation of MRC-13, the Validator Metadata Registry proposed by
 Đorđe Mijović on the Monad forum
 ([topic 497](https://forum.monad.xyz/t/validator-metadata-registry/497), draft
-2026-06-15). It's an on-chain place for human-readable validator metadata that
+2026-06-16). It's an on-chain place for human-readable validator metadata that
 each validator writes for itself.
 
 The staking precompile only carries consensus data: validator ids, authority
@@ -55,6 +55,9 @@ The forum thread raised three; this implementation takes a position on each.
 ## Build and test
 
 ```bash
+git clone --recurse-submodules https://github.com/ShadowOfTime1/monad-validator-metadata
+cd monad-validator-metadata
+
 forge test                          # 11 contract tests against a mock precompile
 cd sdk && npm install && npm test   # 7 SDK tests
 ```
@@ -83,7 +86,7 @@ The constructor takes the staking precompile address; `Deploy.s.sol` wires
 
 ## Status
 
-Implementation of a draft RFC. The interface tracks topic 497 as of 2026-06-15
+Implementation of a draft RFC. The interface tracks topic 497 as of 2026-06-16
 and will follow it if the proposal changes.
 
 Deployed on Monad testnet (chainId 10143) at

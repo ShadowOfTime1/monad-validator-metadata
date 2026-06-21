@@ -57,12 +57,12 @@ contract MockStakingPrecompile is IStakingPrecompile {
     {
         uint256 total = set.length;
         if (startIndex >= total) {
-            return (true, uint32(total), new uint64[](0));
+            return (true, 0, new uint64[](0));
         }
-        uint256 end = total;
-        uint256 n = end - startIndex;
+        uint256 n = total - startIndex;
         valIds = new uint64[](n);
         for (uint256 i = 0; i < n; i++) valIds[i] = set[startIndex + i];
-        return (true, uint32(end), valIds);
+        // Whole set returned in one page, so isDone is true and nextIndex unused.
+        return (true, 0, valIds);
     }
 }
