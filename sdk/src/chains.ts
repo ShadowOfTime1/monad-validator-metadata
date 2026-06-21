@@ -18,6 +18,6 @@ export const monadMainnet = defineChain({
 // trust root is the validator's authority address (checked on-chain), not this
 // address, so a different honest deployment gives the same guarantee.
 export const CANONICAL_REGISTRY: Record<number, `0x${string}` | undefined> = {
-  10143: undefined,
+  10143: "0x3f084CAF88F8894f6c83cf40b9cA7e792D9F221B",
   143: undefined,
 };

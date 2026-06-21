@@ -84,7 +84,11 @@ The constructor takes the staking precompile address; `Deploy.s.sol` wires
 ## Status
 
 Implementation of a draft RFC. The interface tracks topic 497 as of 2026-06-15
-and will follow it if the proposal changes. Not yet deployed to a public network.
+and will follow it if the proposal changes.
+
+Deployed on Monad testnet (chainId 10143) at
+`0x3f084CAF88F8894f6c83cf40b9cA7e792D9F221B`. Validator 267 (shadowoftime) has a
+live record there, written by its own staking authority, as a working example.
 
 ## License
 
