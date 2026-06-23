@@ -22,3 +22,5 @@ export type {
 } from "./observed.js";
 export { ProofLineSource } from "./sources/proofline.js";
 export type { ProofLineSourceOptions } from "./sources/proofline.js";
+export { MonadPulseSource } from "./sources/monadpulse.js";
+export type { MonadPulseSourceOptions } from "./sources/monadpulse.js";

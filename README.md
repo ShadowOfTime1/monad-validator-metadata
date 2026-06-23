@@ -52,6 +52,35 @@ The forum thread raised three; this implementation takes a position on each.
   characters, blocks non-http(s) URLs, and flags invalid JSON. A wallet or
   explorer should run it before rendering.
 
+## Observed cross-check (optional)
+
+The registry holds what a validator declares. For the objective fields under
+`additionalInfo.infrastructure` (provider, asn, region) you can optionally
+cross-check the declared value against what the network actually shows, fully
+off-chain. The contract and resolver are untouched.
+
+`crossCheckInfra(resolved, observations)` returns a per-field status: `verified`
+when declared matches the observed value, `disputed` when it differs,
+`unverified` when nothing was observed or nothing was declared. Observations come
+from one or more `ObservedSource`s, each labelled, so independent vantages
+cross-confirm rather than any single map being trusted. `asn` is the deterministic
+anchor; staleness lowers a field's confidence, not its status.
+
+Two live sources ship today: `ProofLineSource` (ProofLine) and `MonadPulseSource`
+(mine). Both derive provider/asn/region from operator-signed gossip peer IPs and
+publish in the same shape; the IP itself is not published.
+
+```ts
+import { MetadataResolver, ObservedRegistry, ProofLineSource, MonadPulseSource } from "@shadowoftime/mrc13";
+
+const resolver = new MetadataResolver({ rpcUrl, registryAddress });
+const observed = new ObservedRegistry([new ProofLineSource(), new MonadPulseSource()]);
+const v = await observed.verify(resolver, 267); // v.infra = per-field verified/disputed/unverified
+```
+
+The observed-source layer was contributed by ProofLine (issue #1 / PR #2); the
+second vantage and feed are mine.
+
 ## Build and test
 
 ```bash
@@ -59,7 +88,7 @@ git clone --recurse-submodules https://github.com/ShadowOfTime1/monad-validator-
 cd monad-validator-metadata
 
 forge test                          # 11 contract tests against a mock precompile
-cd sdk && npm install && npm test   # 7 SDK tests
+cd sdk && npm install && npm test   # 15 SDK tests
 ```
 
 ## Migrating the existing directory
