@@ -11,3 +11,14 @@ export { registryAbi } from "./abi.registry.js";
 export { stakingPrecompileAbi, STAKING_PRECOMPILE } from "./abi.staking.js";
 export { EMPTY_METADATA } from "./types.js";
 export type { Metadata, ResolvedValidator } from "./types.js";
+export { crossCheckInfra, parseDeclaredInfra, ObservedRegistry } from "./observed.js";
+export type {
+  ObservedInfra,
+  ObservedSource,
+  FieldStatus,
+  FieldVerdict,
+  InfraCrossCheck,
+  VerifiedValidator,
+} from "./observed.js";
+export { ProofLineSource } from "./sources/proofline.js";
+export type { ProofLineSourceOptions } from "./sources/proofline.js";
