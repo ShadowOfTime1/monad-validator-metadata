@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { crossCheckInfra, parseDeclaredInfra, type ObservedInfra } from "./observed.js";
+import { crossCheckInfra, parseDeclaredInfra, ObservedRegistry, type ObservedInfra, type ObservedSource } from "./observed.js";
 import { EMPTY_METADATA, type ResolvedValidator } from "./types.js";
 
 function resolved(validatorId: number, infrastructure: Record<string, unknown> | null): ResolvedValidator {
@@ -100,4 +100,24 @@ test("disagreeing sources: modal value wins, agreement < 1", () => {
   assert.equal(cc.asn.status, "verified");
   assert.equal(cc.asn.observed, 24940);
   assert.equal(Math.round(cc.asn.agreement * 100) / 100, 0.67);
+});
+
+test("ObservedRegistry merges two sources so they cross-confirm", async () => {
+  const source = (id: string, asn: number): ObservedSource => ({
+    id,
+    coverage: "active-set",
+    async get(v) {
+      return v === 42 ? obs(42, id, { asn }) : null;
+    },
+    async getAll() {
+      return [obs(42, id, { asn })];
+    },
+  });
+  const registry = new ObservedRegistry([source("proofline", 24940), source("monadpulse", 24940)]);
+  const observations = await registry.observe(42);
+  assert.equal(observations.length, 2);
+  const cc = crossCheckInfra(resolved(42, { asn: 24940 }), observations);
+  assert.equal(cc.asn.status, "verified");
+  assert.equal(cc.asn.agreement, 1);
+  assert.deepEqual(cc.asn.sources.sort(), ["monadpulse", "proofline"]);
 });

@@ -173,6 +173,13 @@ export function crossCheckInfra(resolved: ResolvedValidator, observations: Obser
 
 // Fan out across several observed sources and cross-check. Each source's value carries
 // its own `source` label, so they cross-confirm rather than any single map being trusted.
+//
+// Example (two independent vantages):
+//   import { ProofLineSource } from "./sources/proofline.js";
+//   import { MonadPulseSource } from "./sources/monadpulse.js";
+//   const registry = new ObservedRegistry([new ProofLineSource(), new MonadPulseSource()]);
+//   const v = await registry.verify(resolver, validatorId);
+//   // v.infra.asn.status is "verified" when the declared asn matches what both vantages observe
 export class ObservedRegistry {
   constructor(private readonly sources: ObservedSource[]) {}
 
